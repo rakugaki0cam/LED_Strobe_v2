@@ -21,8 +21,9 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "mcc_generated_files/system/system.h"
 
-#include "OLED_I2C_Q.h"
+#include "font12x16.h"
 #include "font5x7.h"
+#include "OLED_I2C_Q.h"
 
 
 

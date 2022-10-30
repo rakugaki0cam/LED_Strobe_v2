@@ -29,6 +29,8 @@
  *  2022.10.16  ver.0.29    初速センサ出力BUGFIX スルーレートoff
  *  2022.10.17  ver.0.30    SMT1の入力エッジの設定ミス　rise → fall へバグフィクス。タマモニへの出力OK。
  *  2022.10.21              github rakugaki0cam/LED_Strobe_v2へ。
+ *  2022.10.29  ver.0.31    タイム表示小数点以下2桁に。
+ *  2022.10.29  ver.0.32    フォント12x16数字を追加
  * 
  * 
  */
@@ -40,7 +42,7 @@
 /*
     Main application
 */
-const char  version[] = "0.30"; 
+const char  version[] = "0.32"; 
 bool        timer1_int_flag = 0;
 bool        cmp1_int_flag = 0;
 bool        cmp2_int_flag = 0;
@@ -93,7 +95,7 @@ int main(void)
     
     //OLED & deBUGger
     printf("\n");
-    baikaku = 0;
+    font_size = FONT5X7;
     locate(0, 0);
     printf("********************\n");
     locate(0, 1);
@@ -107,8 +109,16 @@ int main(void)
     __delay_ms(500);
     LED_BLUE_SetLow();
     __delay_ms(1500);
-    OLED_clr(); 
-
+    OLED_clr();
+    
+#if FONT_TEST != 0
+    font_size = FONT12;
+    locate(0,0);
+    printf("0123456789");
+    locate(0,1);
+    printf("123.4 /usm");
+#endif
+    
     cmp1_int_flag = 0;
     cmp2_int_flag = 0;
     PWM1_16BIT_Disable();
@@ -145,12 +155,15 @@ int main(void)
             v0 = SENSOR1_2 / pe;
             
             if ((v0 < 200) && (v0 > 0)){
-                baikaku = 1;
+                font_size = FONT12;
                 locate(1,0);
-                printf("%5.1f mps  %5.1f us", v0, pe * 1000000);
+                printf("%6.2f m/s", v0);
+                locate(0,1);
+                printf("%7.2f us", pe * 1000000);
+
                 
             }else {
-                baikaku = 1;
+                font_size = FONT5X14;
                 locate(0,0);
                 printf("v0:error");
             }
