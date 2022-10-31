@@ -26,11 +26,12 @@
  *  2022.10.08  ver.0.26    タマモニ用光電スイッチ出力(コンパレータ出力 H:idel,L:ON)　測定距離12mm
  *  2022.10.09  ver.0.27    I2C LCD OLED 128x32 追加 I2CノンブロックMCC使用
  *  2022.10.10  ver.0.28    putchをuartとOLED LCDの両方へ
- *  2022.10.16  ver.0.29    初速センサ出力BUGFIX スルーレートoff
+ *  2022.10.16  ver.0.29    初速センサ出力BUGFIX スルーレートmax
  *  2022.10.17  ver.0.30    SMT1の入力エッジの設定ミス　rise → fall へバグフィクス。タマモニへの出力OK。
  *  2022.10.21              github rakugaki0cam/LED_Strobe_v2へ。
  *  2022.10.29  ver.0.31    タイム表示小数点以下2桁に。
  *  2022.10.29  ver.0.32    フォント12x16数字を追加
+ *  2022.10.31  ver.0.33    ディスプレイ表示整理
  * 
  * 
  */
@@ -42,7 +43,7 @@
 /*
     Main application
 */
-const char  version[] = "0.32"; 
+const char  version[] = "0.33"; 
 bool        timer1_int_flag = 0;
 bool        cmp1_int_flag = 0;
 bool        cmp2_int_flag = 0;
@@ -129,7 +130,7 @@ int main(void)
         if (cmp2_int_flag == 1){
             //auto period
             t = SMT1_GetCapturedPeriod();                                   //撮影間隔を12mm間隔にする
-            PWM1_16BIT_WritePeriodRegister((uint16_t)(t & 0x0000ffff));     //cmp2がオンしたらPWM時間をセット
+            PWM1_16BIT_WritePeriodRegister((uint16_t)(t & 0x0000ffff));     //cmp2がオンした後にPWM時間をセット
             
             PWM1_16BIT_Enable();
             //発光時間タイマーの計算(15回発光　12mm x 14 = 168mm)
@@ -156,11 +157,12 @@ int main(void)
             
             if ((v0 < 200) && (v0 > 0)){
                 font_size = FONT12;
-                locate(1,0);
+                locate(0,0);
                 printf("%6.2f m/s", v0);
                 locate(0,1);
                 printf("%7.2f us", pe * 1000000);
-
+                //DEBUGgerとOLEDの両方に表示を出すので、書き方に注意。
+                //locate()はDEBUGgerでは無効になる
                 
             }else {
                 font_size = FONT5X14;
@@ -178,7 +180,7 @@ int main(void)
             OLED_clr(); 
 
             printf("\n");       //撮影中にスクロールさせない。　OCRのために1行あけ
-            printf("\n");
+            printf("\n");       //改行\nはOLEDでは無効となる
             //
             cmp1_int_flag = 0;
             cmp2_int_flag = 0;

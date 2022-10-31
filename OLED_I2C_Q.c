@@ -26,7 +26,7 @@
 
 #include    "OLED_I2C_Q.h"
 
-#define     contrast    30   //127だと露出オーバーISO400　f2.8 1/1.6　60でもややオーバー
+#define     contrast    24   //127だと露出オーバーISO400　f2.8 1/1.6　60でもややオーバー 30でもすこしにじむ
 
 //ハードの選択
 //#define     DISPLAYHEIGHT   64      //128x64 OLED
